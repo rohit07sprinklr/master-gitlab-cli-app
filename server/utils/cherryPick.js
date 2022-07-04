@@ -2,7 +2,7 @@ const git = require("simple-git");
 
 import { log } from "../logger.js";
 
-import { wait, renderPauseMessage } from "./helper";
+import { wait, renderPauseMessage } from "./helper.js";
 
 async function cherryPickProcess(req, res) {
   try {

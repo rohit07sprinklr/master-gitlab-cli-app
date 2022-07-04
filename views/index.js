@@ -19,7 +19,9 @@ const path = require("path");
           logFileContentInDescriptionBox(data);
         }
       });
-    } catch (e) {}
+    } catch (e) {
+        logFileContentInDescriptionBox(`${e.toString()}<br>`);
+    }
   };
 
   async function fetchProfileRequest(jsonInputBody, method) {
@@ -196,8 +198,8 @@ const path = require("path");
         setContentInDesc(" ");
         addProfileForm.reset();
         renderProfiles();
-      } catch (e2) {
-        setContentInDesc(e2);
+      } catch (e) {
+        setContentInDesc(e);
       }
     });
   }
@@ -214,7 +216,7 @@ const path = require("path");
       }
     });
   }
-  var main = () => {
+  const main = () => {
     streamLogFile();
     getProfile();
     AddProfile();

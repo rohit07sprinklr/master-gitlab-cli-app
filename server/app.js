@@ -42,7 +42,8 @@ app.get("/merge", async function (req, res) {
   try {
     const { source, target, location } = req.query;
     const localRepo = await getLocalRepository(location);
-    res.write(`Merge Queued `);
+    res.write(`Merge Queued`);
+    log(`Merge Queued`);
     queue.add(
       async () => await mergeProcess(res, source, target, localRepo.path)
     );
@@ -58,6 +59,7 @@ app.get("/handshake", async function (req, res) {
     log("Handshake successful !!");
     res.end();
   } catch (e) {
+    log(e);
     res.status(400).end();
   }
 });
@@ -67,6 +69,7 @@ app.get("/profiles", async function (req, res) {
     const profileResponse = await getProfiles();
     res.status(200).send(profileResponse);
   } catch (e) {
+    log(e);
     res.status(400).send(e);
   }
 });
@@ -75,6 +78,7 @@ app.post("/profiles", async function (req, res) {
     const profileResponse = await addProfile(req.body);
     res.status(200).send(profileResponse);
   } catch (e) {
+    log(e);
     res.status(400).send(e);
   }
 });
@@ -83,6 +87,7 @@ app.delete("/profiles", async function (req, res) {
     const profileResponse = await deleteProfile(req.body.id);
     res.status(200).send(profileResponse);
   } catch (e) {
+    log(e);
     res.status(400).send(e);
   }
 });
@@ -94,6 +99,7 @@ app.put("/profiles", async function (req, res) {
     );
     res.status(200).send(profileResponse);
   } catch (e) {
+    log(e);
     res.status(400).send(e);
   }
 });
@@ -105,6 +111,7 @@ app.post("/cherrypick", async function (req, res) {
     "access-control-allow-origin": "*",
   });
   res.write(`Cherry-Pick Queued `);
+  log(`Cherry-Pick Queued`);
   queue.add(async () => await cherryPickProcess(req, res));
 });
 
@@ -125,13 +132,22 @@ app.post("/mergecommits", async function (req, res) {
     });
     res.end(JSON.stringify(jsonResponse));
   } catch (e) {
+    log(e);
     res.status(400).end(e.toString());
   }
 });
 
 const init = async () => {
-  await initLogger();
-  app.listen(PORT);
+  try {
+    await initLogger();
+    app.listen(PORT,()=>{
+      log(`Server started on port 4000`)
+    }).on("error", () => {
+      log(`Error: listen EADDRINUSE: address already in use :::4000`);
+    });
+  } catch (e) {
+    log(e);
+  }
 };
 
 init();

@@ -1,4 +1,4 @@
-import { readConfigFile, writeConfigFile } from "./helper";
+import { readConfigFile, writeConfigFile } from "./helper.js";
 
 async function getProfiles() {
   try {

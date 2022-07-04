@@ -4,14 +4,14 @@ const bodyParser = require("body-parser");
 const PQueue = require("p-queue");
 import { getLocalRepository } from "./utils/helper.js";
 import { mergeProcess } from "./utils/merge.js";
-// const { getMergeCommits } = require("./getMergeCommits");
-// const { cherryPickProcess } = require("./cherryPick");
-// const {
-//   getProfiles,
-//   addProfile,
-//   deleteProfile,
-//   updateProfile,
-// } = require("./profiles");
+import { getMergeCommits } from "./utils/getMergeCommits.js";
+import { cherryPickProcess } from "./utils/cherryPick.js";
+import {
+  getProfiles,
+  addProfile,
+  deleteProfile,
+  updateProfile,
+} from "./utils/profiles.js";
 import { log, init as initLogger } from "./logger.js";
 
 //Globals
@@ -19,10 +19,14 @@ const PORT = 4000;
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 
 const queue = new PQueue({ concurrency: 1 });
-
-console.log(PQueue);
 
 //Routes
 app.get("/", (req, res) => {
@@ -58,8 +62,75 @@ app.get("/handshake", async function (req, res) {
   }
 });
 
+app.get("/profiles", async function (req, res) {
+  try {
+    const profileResponse = await getProfiles();
+    res.status(200).send(profileResponse);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+app.post("/profiles", async function (req, res) {
+  try {
+    const profileResponse = await addProfile(req.body);
+    res.status(200).send(profileResponse);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+app.delete("/profiles", async function (req, res) {
+  try {
+    const profileResponse = await deleteProfile(req.body.id);
+    res.status(200).send(profileResponse);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+app.put("/profiles", async function (req, res) {
+  try {
+    const profileResponse = await updateProfile(
+      req.body.id,
+      req.body.profileData
+    );
+    res.status(200).send(profileResponse);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+app.post("/cherrypick", async function (req, res) {
+  res.writeHead(200, {
+    "Content-Type": "text/plain",
+    "Transfer-Encoding": "chunked",
+    "access-control-allow-origin": "*",
+  });
+  res.write(`Cherry-Pick Queued `);
+  queue.add(async () => await cherryPickProcess(req, res));
+});
+
+app.post("/mergecommits", async function (req, res) {
+  try {
+    const { commitAuthor, commitTime, fetchMergeCommitBranch, location } =
+      req.body;
+    const localRepo = await getLocalRepository(location);
+    const jsonResponse = await getMergeCommits(
+      commitAuthor,
+      commitTime,
+      fetchMergeCommitBranch,
+      localRepo
+    );
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+      "access-control-allow-origin": "*",
+    });
+    res.end(JSON.stringify(jsonResponse));
+  } catch (e) {
+    res.status(400).end(e.toString());
+  }
+});
+
 const init = async () => {
-  //   await initLogger();
+  await initLogger();
   app.listen(PORT);
 };
 

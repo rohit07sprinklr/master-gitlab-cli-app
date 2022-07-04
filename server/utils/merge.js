@@ -5,6 +5,7 @@ import { wait } from "./helper.js";
 
 async function mergeProcess(res, source, target, path) {
   try {
+    await wait(100);
     log("start merge");
     log(`fetching ${source}`);
     res.write(`fetching ${source}`);

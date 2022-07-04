@@ -1,11 +1,9 @@
 const fs = require("fs");
-
-const END_OF_CONTENT = "\n";
+const path = require("path");
+const END_OF_CONTENT = "<br>";
 
 export function getLogFilePath() {
-  //Todo => fix FILE_PATH
-  //   return path.join(__dirname, "./console.txt");
-  return "/Users/adityavikramchoudhary/Desktop/my-projects/my-electron-app/server/resources/console.txt";
+  return path.join(__dirname, "../server/resources/console.txt");
 }
 
 const log = async (content) => {

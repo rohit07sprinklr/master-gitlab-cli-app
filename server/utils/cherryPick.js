@@ -1,5 +1,7 @@
 const git = require("simple-git");
 
+import { log } from "../logger.js";
+
 import { wait, renderPauseMessage } from "./helper";
 
 async function cherryPickProcess(req, res) {
@@ -20,13 +22,13 @@ async function cherryPickProcess(req, res) {
           res.write(
             `Deleted existing branch ${commitBranch} and created new branch ${commitBranch}`
           );
-          console.log(
+          log(
             `Deleted existing branch ${commitBranch} and created new branch ${commitBranch}`
           );
         } catch {
           await git(localPath).checkoutBranch(commitBranch, targetBranch);
           res.write(`Created new branch ${commitBranch}`);
-          console.log(`Created new branch ${commitBranch}`);
+          log(`Created new branch ${commitBranch}`);
         }
       }
     } else if (requestType === "continue") {
@@ -47,19 +49,19 @@ async function cherryPickProcess(req, res) {
           commitId.commitSHA,
         ]);
         await wait(500);
-        console.log(`Cherry-pick ${commitId.commitSHA} Successful`);
-        console.log(cherryPickResult);
+        log(`Cherry-pick ${commitId.commitSHA} Successful`);
+        log(cherryPickResult);
         res.write(`Cherry-pick ${commitId.commitSHA} Successful`);
         await wait(500);
       }
     } catch (e) {
       await git(localPath).raw(["cherry-pick", "--abort"]);
-      console.log("Failed");
+      log("Failed");
       res.write(renderPauseMessage(currentCommitSHA, e));
       await wait(100);
       res.write(`Paused {${completedCommits}}`);
       res.end();
-      console.log(e);
+      log(e);
       return;
     }
     res.write(`Pushing ${commitBranch}`);

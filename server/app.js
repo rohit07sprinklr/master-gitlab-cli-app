@@ -138,14 +138,11 @@ app.post("/mergecommits", async function (req, res) {
 });
 
 const init = async () => {
-  try {
+  try{
     await initLogger();
-    app.listen(PORT,()=>{
-      log(`Server started on port 4000`)
-    }).on("error", () => {
-      log(`Error: listen EADDRINUSE: address already in use :::4000`);
-    });
-  } catch (e) {
+    app.listen(PORT);
+  }
+  catch(e){
     log(e);
   }
 };

@@ -53,7 +53,6 @@ app.get("/merge", async function (req, res) {
 });
 
 app.get("/handshake", async function (req, res) {
-  const { location } = req.query;
   try {
     res.status(200).end();
     log("Handshake successful !!");

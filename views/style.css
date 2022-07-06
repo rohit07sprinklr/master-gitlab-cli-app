@@ -50,6 +50,7 @@ h2 {
   margin: auto;
   width: 100%;
   height: 200px;
+  overflow: scroll;
   overflow-y: scroll;
   word-break: break-all;
   padding: 8px;
@@ -70,6 +71,7 @@ h2 {
 }
 #console-expand {
   padding: "2px";
+  overflow: scroll;
   padding-left: "4px";
   padding-right: "4px";
   border: 1px solid rgb(0, 225, 255);

@@ -1,28 +1,30 @@
 const fs = require("fs");
 const path = require("path");
+const ts = require('tail-stream');
 
 (() => {
   const logFileContentInDescriptionBox = (content) => {
+    const consoleBox = document.getElementById('console-box');
     const descriptionBox = document.getElementById("console-desc");
-    descriptionBox.style.display = "block";
-    descriptionBox.innerHTML = content;
+    descriptionBox.insertAdjacentHTML("beforeend",content);
+    consoleBox.scrollTop = consoleBox.scrollHeight;
   };
-
   const streamLogFile = () => {
     const FILE_PATH = path.join(__dirname, "../server/resources/console.txt");
-    let linesRead = 0;
-
-    try {
-      fs.watch(FILE_PATH, (eventType, filename) => {
-        if (eventType === "change") {
-          const data = fs.readFileSync(FILE_PATH, { encoding: "utf-8" });
-          logFileContentInDescriptionBox(data);
-        }
+    try{
+      const tstream = ts.createReadStream(FILE_PATH, {
+        beginAt: 0
       });
-    } catch (e) {
-        logFileContentInDescriptionBox(`${e.toString()}<br>`);
+      tstream.on('data', function(data) {
+        logFileContentInDescriptionBox(data);
+      });
+      tstream.on('error', function(err) {
+        logFileContentInDescriptionBox(`${err.toString()}<br>`);
+      });
+    }catch (e) {
+      logFileContentInDescriptionBox(`${e.toString()}<br>`);
     }
-  };
+  }
 
   async function fetchProfileRequest(jsonInputBody, method) {
     const PORT = 4e3;

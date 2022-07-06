@@ -35,7 +35,7 @@ async function mergeProcess(res, source, target, path) {
   } catch (e) {
     await git(path).merge(["--abort"]);
     res.write(e.toString());
-    console.error(e);
+    log(e);
     log("End merge failure");
     res.end();
   }

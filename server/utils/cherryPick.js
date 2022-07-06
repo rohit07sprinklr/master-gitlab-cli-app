@@ -48,18 +48,18 @@ async function cherryPickProcess(req, res) {
           "1",
           commitId.commitSHA,
         ]);
-        await wait(500);
+        await wait(200);
         log(`Cherry-pick ${commitId.commitSHA} Successful`);
         log(cherryPickResult);
         res.write(`Cherry-pick ${commitId.commitSHA} Successful`);
-        await wait(500);
+        await wait(200);
       }
     } catch (e) {
       await git(localPath).raw(["cherry-pick", "--abort"]);
-      log("Failed");
       res.write(renderPauseMessage(currentCommitSHA, e));
       await wait(100);
       res.write(`Paused {${completedCommits}}`);
+      log("Failed");
       res.end();
       log(e);
       return;
